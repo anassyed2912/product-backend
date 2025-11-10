@@ -8,9 +8,7 @@ import productRouter from "./routes/products";
 import questionRouter from "./routes/questions";
 import authRouter from "./routes/auth";
 
-
 dotenv.config();
-
 
 declare global {
   namespace Express {
@@ -19,7 +17,6 @@ declare global {
     }
   }
 }
-
 
 function authenticate(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -35,7 +32,22 @@ function authenticate(req: Request, res: Response, next: NextFunction) {
 
 async function start() {
   const app = express();
-  app.use(cors());
+
+  // ✅ Updated CORS setup for Render + Vercel
+  const allowedOrigins = [
+    "http://localhost:5173", // local dev
+    "https://product-frontend-anassyed2912.vercel.app" // deployed frontend
+  ];
+
+  app.use(
+    cors({
+      origin: allowedOrigins,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true
+    })
+  );
+
   app.use(bodyParser.json());
 
   const mongoURI = process.env.MONGO_URI || "";
@@ -52,10 +64,14 @@ async function start() {
     process.exit(1);
   }
 
-
   app.use("/api/auth", authRouter);
   app.use("/api/products", authenticate, productRouter);
   app.use("/api", questionRouter);
+
+  // Optional: test endpoint
+  app.get("/", (req: Request, res: Response) => {
+    res.send("✅ Backend running successfully!");
+  });
 
   const port = process.env.PORT || 4000;
   app.listen(port, () =>
