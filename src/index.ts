@@ -36,7 +36,7 @@ async function start() {
   // ✅ Updated CORS setup for Render + Vercel
   const allowedOrigins = [
     "http://localhost:5173", // local dev
-    "https://product-frontend-anassyed2912.vercel.app" // deployed frontend
+    "https://product-frontend-tu9g.vercel.app" // deployed frontend
   ];
 
   app.use(
